@@ -19,3 +19,7 @@
   text-align: center;
   margin: 0 0 1.5rem;
 }
+
+.login-tarjeta {
+  border-top: 3px solid var(--color-primario);
+}

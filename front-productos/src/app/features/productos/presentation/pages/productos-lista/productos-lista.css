@@ -26,8 +26,8 @@
   font-weight: 500;
 }
 
-.badge-activo { background: #dcfce7; color: #16a34a; }
-.badge-inactivo { background: #fee2e2; color: #dc2626; }
+.badge-activo { background: #fce7ef; color: var(--color-primario); }
+.badge-inactivo { background: #f3f4f6; color: var(--color-texto-suave); }
 
 .acciones { display: flex; gap: 0.375rem; }
 
