@@ -1,0 +1,26 @@
+@if (lotes().length === 0) {
+  <p class="sin-lotes">Sin lotes registrados.</p>
+} @else {
+  <table class="tabla tabla-lotes">
+    <thead>
+      <tr>
+        <th>N° Lote</th>
+        <th>Precio</th>
+        <th>Stock</th>
+        <th>Ingreso</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (l of lotes(); track l.id) {
+        <tr>
+          <td data-label="N° Lote">{{ l.numeroLote }}</td>
+          <td data-label="Precio">$ {{ l.precio | number:'1.2-2' }}</td>
+          <td data-label="Stock">{{ l.stock }}</td>
+          <td data-label="Ingreso">{{ l.fechaIngreso | date:'dd/MM/yyyy' }}</td>
+          <td data-label="Estado">{{ l.estado ? 'Activo' : 'Inactivo' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

@@ -1,0 +1,102 @@
+<div class="cabecera">
+  <h2>{{ esNuevo ? 'Nuevo producto' : 'Editar producto' }}</h2>
+  <a routerLink="/productos" class="boton boton-secundario">← Volver</a>
+</div>
+
+@if (cargando()) {
+  <div class="estado-vacio">Cargando...</div>
+} @else {
+  <div class="grilla-form">
+    <div class="tarjeta">
+      <h3 class="seccion-titulo">Datos del producto</h3>
+      <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+        <div class="campo-grupo">
+          <label class="campo-label" for="codigo">Código</label>
+          <input id="codigo" type="text" class="campo" formControlName="codigo" />
+          @if (form.get('codigo')?.invalid && form.get('codigo')?.touched) {
+            <span class="campo-error">El código es requerido (máx. 50 caracteres).</span>
+          }
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label" for="nombre">Nombre</label>
+          <input id="nombre" type="text" class="campo" formControlName="nombre" />
+          @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+            <span class="campo-error">El nombre es requerido (2–150 caracteres).</span>
+          }
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-label" for="descripcion">Descripción</label>
+          <textarea id="descripcion" class="campo campo-textarea" formControlName="descripcion" rows="3"></textarea>
+        </div>
+        <button type="submit" class="boton boton-primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : (esNuevo ? 'Crear producto' : 'Guardar cambios') }}
+        </button>
+      </form>
+    </div>
+
+    @if (!esNuevo) {
+      <div class="tarjeta">
+        <h3 class="seccion-titulo">{{ loteEditando() ? 'Editar lote' : 'Agregar lote' }}</h3>
+        <form [formGroup]="loteForm" (ngSubmit)="enviarLote()" novalidate>
+          <div class="campo-grupo">
+            <label class="campo-label" for="numeroLote">N° de lote</label>
+            <input id="numeroLote" type="text" class="campo" formControlName="numeroLote" />
+            @if (loteForm.get('numeroLote')?.invalid && loteForm.get('numeroLote')?.touched) {
+              <span class="campo-error">El número de lote es requerido.</span>
+            }
+          </div>
+          <div class="fila-dos">
+            <div class="campo-grupo">
+              <label class="campo-label" for="precio">Precio</label>
+              <input id="precio" type="number" class="campo" formControlName="precio" min="0.01" step="0.01" />
+              @if (loteForm.get('precio')?.invalid && loteForm.get('precio')?.touched) {
+                <span class="campo-error">Precio mayor a 0.</span>
+              }
+            </div>
+            <div class="campo-grupo">
+              <label class="campo-label" for="stock">Stock</label>
+              <input id="stock" type="number" class="campo" formControlName="stock" min="0" />
+              @if (loteForm.get('stock')?.invalid && loteForm.get('stock')?.touched) {
+                <span class="campo-error">Stock debe ser ≥ 0.</span>
+              }
+            </div>
+          </div>
+          <div class="acciones-lote">
+            <button type="submit" class="boton boton-primario" [disabled]="guardandoLote()">
+              {{ guardandoLote() ? 'Guardando...' : (loteEditando() ? 'Actualizar lote' : 'Agregar lote') }}
+            </button>
+            @if (loteEditando()) {
+              <button type="button" class="boton boton-secundario" (click)="cancelarLote()">Cancelar</button>
+            }
+          </div>
+        </form>
+
+        @if (lotes().length > 0) {
+          <table class="tabla tabla-lotes-form">
+            <thead>
+              <tr>
+                <th>N° Lote</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (l of lotes(); track l.id) {
+                <tr>
+                  <td data-label="N° Lote">{{ l.numeroLote }}</td>
+                  <td data-label="Precio">$ {{ l.precio | number:'1.2-2' }}</td>
+                  <td data-label="Stock">{{ l.stock }}</td>
+                  <td data-label="Acciones" class="acciones">
+                    <button class="boton boton-secundario boton-sm" (click)="editarLote(l)">Editar</button>
+                    <button class="boton boton-peligro boton-sm" (click)="confirmarEliminarLote(l)">Eliminar</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+  </div>
+}
