@@ -83,6 +83,7 @@ Desktop.ini
 # =====================================
 appsettings.*.json
 !appsettings.json
+!appsettings.Example.json
 !appsettings.*.example.json
 
 # =====================================
