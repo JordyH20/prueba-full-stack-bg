@@ -1,0 +1,45 @@
+<div class="login-contenedor">
+  <div class="tarjeta login-tarjeta">
+    <h1 class="login-titulo">Inventario</h1>
+
+    @if (error()) {
+      <div class="alerta alerta-error">{{ error() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+      <div class="campo-grupo">
+        <label class="campo-label" for="correo">Correo</label>
+        <input
+          id="correo"
+          type="email"
+          class="campo"
+          formControlName="correo"
+          autocomplete="email"
+          placeholder="usuario@correo.com"
+        />
+        @if (form.get('correo')?.invalid && form.get('correo')?.touched) {
+          <span class="campo-error">Ingresá un correo válido.</span>
+        }
+      </div>
+
+      <div class="campo-grupo">
+        <label class="campo-label" for="contrasena">Contraseña</label>
+        <input
+          id="contrasena"
+          type="password"
+          class="campo"
+          formControlName="contrasena"
+          autocomplete="current-password"
+          placeholder="••••••••"
+        />
+        @if (form.get('contrasena')?.invalid && form.get('contrasena')?.touched) {
+          <span class="campo-error">La contraseña es requerida.</span>
+        }
+      </div>
+
+      <button type="submit" class="boton boton-primario" [disabled]="cargando()">
+        {{ cargando() ? 'Ingresando...' : 'Ingresar' }}
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<header class="barra">
+  <span class="barra-titulo">Inventario de Productos</span>
+  <div class="barra-usuario">
+    <span>{{ nombre }} <em class="barra-rol">({{ rol }})</em></span>
+    <button class="boton boton-secundario boton-sm" (click)="salir()">Salir</button>
+  </div>
+</header>
+
+@if (notifier.mensaje()) {
+  <div class="alerta alerta-error alerta-global">{{ notifier.mensaje() }}</div>
+}
+
+<main class="contenido">
+  <router-outlet />
+</main>

@@ -1,0 +1,21 @@
+.login-contenedor {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-fondo);
+  padding: 1rem;
+}
+
+.login-tarjeta {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-titulo {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-primario);
+  text-align: center;
+  margin: 0 0 1.5rem;
+}
