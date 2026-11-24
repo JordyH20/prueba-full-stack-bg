@@ -2,6 +2,7 @@ using BackProductos.Application.Productos.Ports.In;
 using BackProductos.Application.Productos.Ports.Out;
 using BackProductos.Application.Shared.Exceptions;
 using BackProductos.Domain.Productos;
+using Producto = BackProductos.Domain.Productos.Productos;
 
 namespace BackProductos.Application.Productos.UseCases
 {
@@ -13,8 +14,24 @@ namespace BackProductos.Application.Productos.UseCases
 
         public Task<IReadOnlyList<ProductoResponseDto>> ObtenerTodosAsync() => _repositorio.ObtenerTodosAsync();
 
-        public async Task<ProductoResponseDto> ObtenerPorIdAsync(int id) =>
-            await _repositorio.ObtenerPorIdAsync(id) ?? throw new NotFoundException($"No existe el producto {id}.");
+        public async Task<ProductoDetalleDto> ObtenerPorIdAsync(int id)
+        {
+            var producto = await _repositorio.ObtenerPorIdAsync(id)
+                ?? throw new NotFoundException($"No existe el producto {id}.");
+            var lotes = await _repositorio.ObtenerLotesAsync(id);
+            return new ProductoDetalleDto
+            {
+                Id = producto.Id,
+                Codigo = producto.Codigo,
+                Nombre = producto.Nombre,
+                Descripcion = producto.Descripcion,
+                Estado = producto.Estado,
+                StockTotal = producto.StockTotal,
+                FechaCreacion = producto.FechaCreacion,
+                FechaActualizacion = producto.FechaActualizacion,
+                Lotes = lotes
+            };
+        }
 
         public async Task<ProductoResponseDto> CrearAsync(ProductoRequest request)
         {
@@ -22,7 +39,7 @@ namespace BackProductos.Application.Productos.UseCases
             if (await _repositorio.ExisteCodigoAsync(codigo))
                 throw new ConflictException("Ya existe un producto con ese código.");
 
-            var producto = new BackProductos.Domain.Productos.Productos
+            var producto = new Producto
             {
                 Codigo = codigo,
                 Nombre = request.Nombre.Trim(),
@@ -31,7 +48,8 @@ namespace BackProductos.Application.Productos.UseCases
                 FechaCreacion = DateTime.UtcNow
             };
             var id = await _repositorio.CrearAsync(producto);
-            return await ObtenerPorIdAsync(id);
+            return await _repositorio.ObtenerPorIdAsync(id)
+                ?? throw new NotFoundException($"No existe el producto {id}.");
         }
 
         public async Task<ProductoResponseDto> ActualizarAsync(int id, ProductoRequest request)
@@ -42,7 +60,7 @@ namespace BackProductos.Application.Productos.UseCases
             if (await _repositorio.ExisteCodigoAsync(codigo, id))
                 throw new ConflictException("Ya existe un producto con ese código.");
 
-            var producto = new BackProductos.Domain.Productos.Productos
+            var producto = new Producto
             {
                 Id = actual.Id,
                 Codigo = codigo,
@@ -53,12 +71,14 @@ namespace BackProductos.Application.Productos.UseCases
                 FechaActualizacion = DateTime.UtcNow
             };
             await _repositorio.ActualizarAsync(producto);
-            return await ObtenerPorIdAsync(id);
+            return await _repositorio.ObtenerPorIdAsync(id)
+                ?? throw new NotFoundException($"No existe el producto {id}.");
         }
 
         public async Task EliminarAsync(int id)
         {
-            _ = await ObtenerPorIdAsync(id);
+            _ = await _repositorio.ObtenerPorIdAsync(id)
+                ?? throw new NotFoundException($"No existe el producto {id}.");
             if (await _repositorio.TieneLotesAsync(id))
                 throw new ConflictException("No se puede eliminar el producto porque tiene lotes asociados.");
             if (!await _repositorio.EliminarAsync(id))
@@ -67,7 +87,8 @@ namespace BackProductos.Application.Productos.UseCases
 
         public async Task<LoteProductoResponseDto> RegistrarLoteAsync(int productoId, LoteProductoRequest request)
         {
-            _ = await ObtenerPorIdAsync(productoId);
+            _ = await _repositorio.ObtenerPorIdAsync(productoId)
+                ?? throw new NotFoundException($"No existe el producto {productoId}.");
             var lote = new LotesProductos
             {
                 ProductoId = productoId,
@@ -81,9 +102,46 @@ namespace BackProductos.Application.Productos.UseCases
             return (await _repositorio.ObtenerLotesAsync(productoId)).Single(l => l.Id == lote.Id);
         }
 
+        public async Task<LoteProductoResponseDto> ActualizarLoteAsync(int productoId, int loteId, LoteProductoRequest request)
+        {
+            _ = await _repositorio.ObtenerPorIdAsync(productoId)
+                ?? throw new NotFoundException($"No existe el producto {productoId}.");
+            var loteActual = await _repositorio.ObtenerLotePorIdAsync(loteId)
+                ?? throw new NotFoundException($"No existe el lote {loteId}.");
+            if (loteActual.ProductoId != productoId)
+                throw new NotFoundException($"No existe el lote {loteId}.");
+
+            var lote = new LotesProductos
+            {
+                Id = loteId,
+                ProductoId = productoId,
+                NumeroLote = request.NumeroLote.Trim(),
+                Precio = request.Precio,
+                Stock = request.Stock,
+                Estado = loteActual.Estado,
+                FechaIngreso = loteActual.FechaIngreso,
+                FechaActualizacion = DateTime.UtcNow
+            };
+            await _repositorio.ActualizarLoteAsync(lote);
+            return (await _repositorio.ObtenerLotesAsync(productoId)).Single(l => l.Id == loteId);
+        }
+
+        public async Task EliminarLoteAsync(int productoId, int loteId)
+        {
+            _ = await _repositorio.ObtenerPorIdAsync(productoId)
+                ?? throw new NotFoundException($"No existe el producto {productoId}.");
+            var lote = await _repositorio.ObtenerLotePorIdAsync(loteId)
+                ?? throw new NotFoundException($"No existe el lote {loteId}.");
+            if (lote.ProductoId != productoId)
+                throw new NotFoundException($"No existe el lote {loteId}.");
+            if (!await _repositorio.EliminarLoteAsync(loteId))
+                throw new NotFoundException($"No existe el lote {loteId}.");
+        }
+
         public async Task<IReadOnlyList<LoteProductoResponseDto>> ObtenerLotesAsync(int productoId)
         {
-            _ = await ObtenerPorIdAsync(productoId);
+            _ = await _repositorio.ObtenerPorIdAsync(productoId)
+                ?? throw new NotFoundException($"No existe el producto {productoId}.");
             return await _repositorio.ObtenerLotesAsync(productoId);
         }
     }

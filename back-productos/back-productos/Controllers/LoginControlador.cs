@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace back_productos.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/auth")]
 [ApiController]
 public class LoginControlador(IAuthServicio authServicio) : ControllerBase
 {

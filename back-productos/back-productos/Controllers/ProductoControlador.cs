@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace back_productos.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/productos")]
 [ApiController]
 public class ProductoControlador(IProductoServicio productoServicio) : ControllerBase
 {
@@ -16,7 +16,7 @@ public class ProductoControlador(IProductoServicio productoServicio) : Controlle
 
     [Authorize]
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<ProductoResponseDto>> ObtenerPorId(int id) =>
+    public async Task<ActionResult<ProductoDetalleDto>> ObtenerPorId(int id) =>
         Ok(await productoServicio.ObtenerPorIdAsync(id));
 
     [Authorize(Roles = "Admin")]
@@ -35,6 +35,7 @@ public class ProductoControlador(IProductoServicio productoServicio) : Controlle
 
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Eliminar(int id)
     {
         await productoServicio.EliminarAsync(id);
@@ -53,5 +54,19 @@ public class ProductoControlador(IProductoServicio productoServicio) : Controlle
     {
         var lote = await productoServicio.RegistrarLoteAsync(productoId, request);
         return CreatedAtAction(nameof(ObtenerLotes), new { productoId }, lote);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{productoId:int}/lotes/{loteId:int}")]
+    public async Task<ActionResult<LoteProductoResponseDto>> ActualizarLote(int productoId, int loteId, [FromBody] LoteProductoRequest request) =>
+        Ok(await productoServicio.ActualizarLoteAsync(productoId, loteId, request));
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("{productoId:int}/lotes/{loteId:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> EliminarLote(int productoId, int loteId)
+    {
+        await productoServicio.EliminarLoteAsync(productoId, loteId);
+        return NoContent();
     }
 }
