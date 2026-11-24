@@ -6,7 +6,7 @@ namespace BackProductos.Application.Productos.Ports.Out;
 
 public interface IProductoRepositorio
 {
-    Task<IReadOnlyList<ProductoResponseDto>> ObtenerTodosAsync();
+    Task<IReadOnlyList<ProductoResponseDto>> ObtenerTodosAsync(bool soloActivos = false);
     Task<ProductoResponseDto?> ObtenerPorIdAsync(int id);
     Task<bool> ExisteCodigoAsync(string codigo, int? excluirId = null);
     Task<int> CrearAsync(Producto producto);

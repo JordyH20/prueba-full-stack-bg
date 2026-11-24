@@ -38,8 +38,8 @@
             <td data-label="Nombre">{{ p.nombre }}</td>
             <td data-label="Stock total">{{ p.stockTotal }}</td>
             <td data-label="Estado">
-              <span class="badge" [class.badge-activo]="p.estado" [class.badge-inactivo]="!p.estado">
-                {{ p.estado ? 'Activo' : 'Inactivo' }}
+              <span class="badge" [class.badge-activo]="p.estado === 'A'" [class.badge-inactivo]="p.estado === 'I'">
+                {{ p.estado === 'A' ? 'Activo' : (p.estado === 'I' ? 'Inactivo' : 'Eliminado') }}
               </span>
             </td>
             <td data-label="Lotes">

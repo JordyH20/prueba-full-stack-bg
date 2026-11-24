@@ -74,6 +74,7 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
+app.UseCors("AngularPolicy");
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -82,8 +83,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AngularPolicy");
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

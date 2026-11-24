@@ -4,7 +4,7 @@ export interface Lote {
   numeroLote: string;
   precio: number;
   stock: number;
-  estado: boolean;
+  estado: string;
   fechaIngreso: string;
   fechaActualizacion: string | null;
 }

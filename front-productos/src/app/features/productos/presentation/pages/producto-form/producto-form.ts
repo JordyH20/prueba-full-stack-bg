@@ -33,7 +33,8 @@ export class ProductoFormComponent implements OnInit {
   readonly form = this.fb.group({
     codigo: ['', [Validators.required, Validators.maxLength(50)]],
     nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(150)]],
-    descripcion: ['', Validators.maxLength(500)]
+    descripcion: ['', Validators.maxLength(500)],
+    estado: ['A', [Validators.required, Validators.pattern('^[AIN]$')]]
   });
 
   readonly loteForm = this.fb.group({
@@ -52,7 +53,7 @@ export class ProductoFormComponent implements OnInit {
       this.cargando.set(true);
       this.obtener.ejecutar(id).subscribe({
         next: p => {
-          this.form.patchValue({ codigo: p.codigo, nombre: p.nombre, descripcion: p.descripcion });
+          this.form.patchValue({ codigo: p.codigo, nombre: p.nombre, descripcion: p.descripcion, estado: p.estado });
           this.lotes.set(p.lotes);
           this.cargando.set(false);
         },
@@ -65,7 +66,7 @@ export class ProductoFormComponent implements OnInit {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.guardando.set(true);
     const v = this.form.getRawValue();
-    const form = { codigo: v.codigo!, nombre: v.nombre!, descripcion: v.descripcion ?? '' };
+    const form = { codigo: v.codigo!, nombre: v.nombre!, descripcion: v.descripcion ?? '', estado: v.estado ?? 'A' };
     const obs = this.esNuevo
       ? this.guardar.crear(form)
       : this.guardar.actualizar(this.productoId()!, form);

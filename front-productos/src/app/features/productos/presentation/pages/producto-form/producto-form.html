@@ -28,6 +28,16 @@
           <label class="campo-label" for="descripcion">Descripción</label>
           <textarea id="descripcion" class="campo campo-textarea" formControlName="descripcion" rows="3"></textarea>
         </div>
+        <div class="campo-grupo">
+          <label class="campo-label" for="estado">Estado</label>
+          <select id="estado" class="campo" formControlName="estado">
+            <option value="A">Activo</option>
+            <option value="I">Inactivo</option>
+          </select>
+          @if (form.get('estado')?.invalid && form.get('estado')?.touched) {
+            <span class="campo-error">Selecciona un estado válido.</span>
+          }
+        </div>
         <button type="submit" class="boton boton-primario" [disabled]="guardando()">
           {{ guardando() ? 'Guardando...' : (esNuevo ? 'Crear producto' : 'Guardar cambios') }}
         </button>

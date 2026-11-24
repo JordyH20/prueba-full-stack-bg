@@ -4,7 +4,7 @@ namespace BackProductos.Application.Productos.Ports.In;
 
 public interface IProductoServicio
 {
-    Task<IReadOnlyList<ProductoResponseDto>> ObtenerTodosAsync();
+    Task<IReadOnlyList<ProductoResponseDto>> ObtenerTodosAsync(bool soloActivos = false);
     Task<ProductoDetalleDto> ObtenerPorIdAsync(int id);
     Task<ProductoResponseDto> CrearAsync(ProductoRequest request);
     Task<ProductoResponseDto> ActualizarAsync(int id, ProductoRequest request);

@@ -11,14 +11,17 @@ public sealed class ProductoRepositorio(DapperData data) : IProductoRepositorio
 {
     private const string SelectProducto =
         "SELECT p.Id, p.Codigo, p.Nombre, p.Descripcion, p.Estado, " +
-        "CAST(COALESCE(SUM(CASE WHEN l.Estado = 1 THEN l.Stock ELSE 0 END), 0) AS int) AS StockTotal, " +
+        "CAST(COALESCE(SUM(CASE WHEN l.Estado = 'A' THEN l.Stock ELSE 0 END), 0) AS int) AS StockTotal, " +
         "p.FechaCreacion, p.FechaActualizacion " +
         "FROM dbo.Productos p LEFT JOIN dbo.LotesProductos l ON l.ProductoId = p.Id";
 
-    public async Task<IReadOnlyList<ProductoResponseDto>> ObtenerTodosAsync()
+    public async Task<IReadOnlyList<ProductoResponseDto>> ObtenerTodosAsync(bool soloActivos = false)
     {
-        const string sql = SelectProducto +
-            " WHERE p.Estado = 1 GROUP BY p.Id, p.Codigo, p.Nombre, p.Descripcion, p.Estado, p.FechaCreacion, p.FechaActualizacion ORDER BY p.Id";
+        var filtro = soloActivos
+            ? " WHERE p.Estado = 'A' GROUP BY "
+            : " WHERE p.Estado <> 'N' GROUP BY ";
+        var sql = SelectProducto + filtro +
+            " p.Id, p.Codigo, p.Nombre, p.Descripcion, p.Estado, p.FechaCreacion, p.FechaActualizacion ORDER BY p.Id";
         using var connection = data.CreateConnection();
         return (await connection.QueryAsync<ProductoResponseDto>(sql)).AsList();
     }
@@ -26,7 +29,7 @@ public sealed class ProductoRepositorio(DapperData data) : IProductoRepositorio
     public async Task<ProductoResponseDto?> ObtenerPorIdAsync(int id)
     {
         const string sql = SelectProducto +
-            " WHERE p.Id = @Id GROUP BY p.Id, p.Codigo, p.Nombre, p.Descripcion, p.Estado, p.FechaCreacion, p.FechaActualizacion";
+            " WHERE p.Id = @Id AND p.Estado <> 'N' GROUP BY p.Id, p.Codigo, p.Nombre, p.Descripcion, p.Estado, p.FechaCreacion, p.FechaActualizacion";
         using var connection = data.CreateConnection();
         return await connection.QuerySingleOrDefaultAsync<ProductoResponseDto>(sql, new { Id = id });
     }
@@ -53,14 +56,14 @@ public sealed class ProductoRepositorio(DapperData data) : IProductoRepositorio
     {
         const string sql =
             "UPDATE dbo.Productos SET Codigo = @Codigo, Nombre = @Nombre, Descripcion = @Descripcion, " +
-            "FechaActualizacion = @FechaActualizacion WHERE Id = @Id";
+            "Estado = @Estado, FechaActualizacion = @FechaActualizacion WHERE Id = @Id";
         using var connection = data.CreateConnection();
         return await connection.ExecuteAsync(sql, producto) == 1;
     }
 
     public async Task<bool> EliminarAsync(int id)
     {
-        const string sql = "UPDATE dbo.Productos SET Estado = 0, FechaActualizacion = GETUTCDATE() WHERE Id = @Id";
+        const string sql = "UPDATE dbo.Productos SET Estado = 'N', FechaActualizacion = GETUTCDATE() WHERE Id = @Id";
         using var connection = data.CreateConnection();
         return await connection.ExecuteAsync(sql, new { Id = id }) == 1;
     }
@@ -69,7 +72,7 @@ public sealed class ProductoRepositorio(DapperData data) : IProductoRepositorio
     {
         const string sql =
             "SELECT CASE WHEN EXISTS (" +
-            "SELECT 1 FROM dbo.LotesProductos WHERE ProductoId = @ProductoId AND Estado = 1" +
+            "SELECT 1 FROM dbo.LotesProductos WHERE ProductoId = @ProductoId AND Estado <> 'N'" +
             ") THEN 1 ELSE 0 END";
         using var connection = data.CreateConnection();
         return await connection.ExecuteScalarAsync<bool>(sql, new { ProductoId = productoId });
@@ -95,7 +98,7 @@ public sealed class ProductoRepositorio(DapperData data) : IProductoRepositorio
 
     public async Task<bool> EliminarLoteAsync(int loteId)
     {
-        const string sql = "UPDATE dbo.LotesProductos SET Estado = 0, FechaActualizacion = GETUTCDATE() WHERE Id = @Id";
+        const string sql = "UPDATE dbo.LotesProductos SET Estado = 'N', FechaActualizacion = GETUTCDATE() WHERE Id = @Id";
         using var connection = data.CreateConnection();
         return await connection.ExecuteAsync(sql, new { Id = loteId }) == 1;
     }
@@ -113,7 +116,7 @@ public sealed class ProductoRepositorio(DapperData data) : IProductoRepositorio
     {
         const string sql =
             "SELECT Id, ProductoId, NumeroLote, Precio, Stock, Estado, FechaIngreso, FechaActualizacion " +
-            "FROM dbo.LotesProductos WHERE ProductoId = @ProductoId ORDER BY Id DESC";
+            "FROM dbo.LotesProductos WHERE ProductoId = @ProductoId AND Estado <> 'N' ORDER BY Id DESC";
         using var connection = data.CreateConnection();
         return (await connection.QueryAsync<LoteProductoResponseDto>(sql, new { ProductoId = productoId })).AsList();
     }

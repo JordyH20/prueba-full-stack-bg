@@ -5,7 +5,7 @@ export interface Producto {
   codigo: string;
   nombre: string;
   descripcion: string;
-  estado: boolean;
+  estado: string;
   stockTotal: number;
   fechaCreacion: string;
   fechaActualizacion: string | null;

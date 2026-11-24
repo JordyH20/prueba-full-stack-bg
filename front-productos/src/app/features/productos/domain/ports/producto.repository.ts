@@ -7,6 +7,7 @@ export interface ProductoForm {
   codigo: string;
   nombre: string;
   descripcion: string;
+  estado: string;
 }
 
 export interface LoteForm {

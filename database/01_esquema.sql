@@ -34,7 +34,8 @@ BEGIN
         Codigo             NVARCHAR(50)  NOT NULL CONSTRAINT UQ_Productos_Codigo UNIQUE,
         Nombre             NVARCHAR(150) NOT NULL,
         Descripcion        NVARCHAR(500) NOT NULL CONSTRAINT DF_Productos_Descripcion DEFAULT '',
-        Estado             BIT           NOT NULL CONSTRAINT DF_Productos_Estado DEFAULT 1,
+        Estado             CHAR(1)       NOT NULL CONSTRAINT DF_Productos_Estado DEFAULT 'A'
+                                     CONSTRAINT CK_Productos_Estado CHECK (Estado IN ('A','I','N')),
         FechaCreacion      DATETIME2     NOT NULL CONSTRAINT DF_Productos_FechaCreacion DEFAULT GETUTCDATE(),
         FechaActualizacion DATETIME2     NULL
     );
@@ -51,7 +52,8 @@ BEGIN
         NumeroLote         NVARCHAR(50)  NOT NULL,
         Precio             DECIMAL(18,2) NOT NULL,
         Stock              INT           NOT NULL CONSTRAINT DF_LotesProductos_Stock DEFAULT 0,
-        Estado             BIT           NOT NULL CONSTRAINT DF_LotesProductos_Estado DEFAULT 1,
+        Estado             CHAR(1)       NOT NULL CONSTRAINT DF_LotesProductos_Estado DEFAULT 'A'
+                                     CONSTRAINT CK_LotesProductos_Estado CHECK (Estado IN ('A','I','N')),
         FechaIngreso       DATETIME2     NOT NULL CONSTRAINT DF_LotesProductos_FechaIngreso DEFAULT GETUTCDATE(),
         FechaActualizacion DATETIME2     NULL,
         CONSTRAINT UQ_LotesProductos_Lote UNIQUE (ProductoId, NumeroLote)

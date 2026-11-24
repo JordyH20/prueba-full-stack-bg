@@ -12,4 +12,7 @@ public class ProductoRequest
 
     [StringLength(1000)]
     public string Descripcion { get; set; } = string.Empty;
+
+    [RegularExpression("^[AIN]$", ErrorMessage = "El estado debe ser A, I o N.")]
+    public string Estado { get; set; } = "A";
 }

@@ -18,7 +18,7 @@
           <td data-label="Precio">$ {{ l.precio | number:'1.2-2' }}</td>
           <td data-label="Stock">{{ l.stock }}</td>
           <td data-label="Ingreso">{{ l.fechaIngreso | date:'dd/MM/yyyy' }}</td>
-          <td data-label="Estado">{{ l.estado ? 'Activo' : 'Inactivo' }}</td>
+          <td data-label="Estado">{{ l.estado === 'A' ? 'Activo' : (l.estado === 'I' ? 'Inactivo' : 'Eliminado') }}</td>
         </tr>
       }
     </tbody>

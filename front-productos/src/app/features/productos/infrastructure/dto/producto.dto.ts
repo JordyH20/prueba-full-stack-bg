@@ -4,7 +4,7 @@ export interface LoteDto {
   numeroLote: string;
   precio: number;
   stock: number;
-  estado: boolean;
+  estado: string;
   fechaIngreso: string;
   fechaActualizacion: string | null;
 }
@@ -14,7 +14,7 @@ export interface ProductoDto {
   codigo: string;
   nombre: string;
   descripcion: string;
-  estado: boolean;
+  estado: string;
   stockTotal: number;
   fechaCreacion: string;
   fechaActualizacion: string | null;

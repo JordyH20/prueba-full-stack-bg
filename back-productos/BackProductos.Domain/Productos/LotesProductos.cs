@@ -7,7 +7,7 @@ namespace BackProductos.Domain.Productos
         public string NumeroLote { get; set; } = string.Empty;
         public decimal Precio { get; set; }
         public int Stock { get; set; }
-        public bool Estado { get; set; } = true;
+        public string Estado { get; set; } = "A";
         public DateTime FechaIngreso { get; set; }
         public DateTime? FechaActualizacion { get; set; }
     }

@@ -12,7 +12,8 @@ namespace BackProductos.Application.Productos.UseCases
 
         public ProductoUseCase(IProductoRepositorio repositorio) => _repositorio = repositorio;
 
-        public Task<IReadOnlyList<ProductoResponseDto>> ObtenerTodosAsync() => _repositorio.ObtenerTodosAsync();
+        public Task<IReadOnlyList<ProductoResponseDto>> ObtenerTodosAsync(bool soloActivos = false) =>
+            _repositorio.ObtenerTodosAsync(soloActivos);
 
         public async Task<ProductoDetalleDto> ObtenerPorIdAsync(int id)
         {
@@ -44,7 +45,7 @@ namespace BackProductos.Application.Productos.UseCases
                 Codigo = codigo,
                 Nombre = request.Nombre.Trim(),
                 Descripcion = request.Descripcion.Trim(),
-                Estado = true,
+                Estado = "A",
                 FechaCreacion = DateTime.UtcNow
             };
             var id = await _repositorio.CrearAsync(producto);
@@ -66,7 +67,7 @@ namespace BackProductos.Application.Productos.UseCases
                 Codigo = codigo,
                 Nombre = request.Nombre.Trim(),
                 Descripcion = request.Descripcion.Trim(),
-                Estado = actual.Estado,
+                Estado = request.Estado,
                 FechaCreacion = actual.FechaCreacion,
                 FechaActualizacion = DateTime.UtcNow
             };
@@ -95,7 +96,7 @@ namespace BackProductos.Application.Productos.UseCases
                 NumeroLote = request.NumeroLote.Trim(),
                 Precio = request.Precio,
                 Stock = request.Stock,
-                Estado = true,
+                Estado = "A",
                 FechaIngreso = DateTime.UtcNow
             };
             lote.Id = await _repositorio.CrearLoteAsync(lote);

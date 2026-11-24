@@ -11,8 +11,11 @@ public class ProductoControlador(IProductoServicio productoServicio) : Controlle
 {
     [Authorize]
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<ProductoResponseDto>>> ObtenerTodos() =>
-        Ok(await productoServicio.ObtenerTodosAsync());
+    public async Task<ActionResult<IReadOnlyList<ProductoResponseDto>>> ObtenerTodos()
+    {
+        var esAdmin = User.IsInRole("Admin");
+        return Ok(await productoServicio.ObtenerTodosAsync(!esAdmin));
+    }
 
     [Authorize]
     [HttpGet("{id:int}")]
