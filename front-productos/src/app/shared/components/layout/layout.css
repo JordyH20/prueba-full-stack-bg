@@ -42,3 +42,30 @@
   max-width: 1100px;
   margin: 0 auto;
 }
+
+@media (max-width: 768px) {
+  .barra {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    text-align: center;
+  }
+
+  .barra-titulo { font-size: 0.9rem; }
+
+  .barra-usuario {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .alerta-global {
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    min-width: 0;
+  }
+
+  .contenido { padding: 1rem; }
+}

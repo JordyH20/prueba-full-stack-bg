@@ -6,6 +6,7 @@ import { ErrorNotifierService } from '../services/error-notifier.service';
 import { LoggerService } from '../services/logger.service';
 
 const MENSAJES: Record<number, string> = {
+  0:   'Sin conexión con el servidor. Verificá que el backend esté corriendo.',
   400: 'Los datos enviados no son válidos.',
   401: 'Sesión expirada. Por favor iniciá sesión nuevamente.',
   403: 'No tenés permiso para realizar esta acción.',
@@ -27,7 +28,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(reqConToken).pipe(
     catchError(err => {
       const status: number = err.status ?? 0;
-      const mensaje = MENSAJES[status] ?? 'Sin conexión con el servidor.';
+      const mensaje = MENSAJES[status] ?? 'Error inesperado al conectar con el servidor.';
 
       logger.error(`HTTP ${status} en ${req.url}`, err);
       notifier.mostrar(mensaje);

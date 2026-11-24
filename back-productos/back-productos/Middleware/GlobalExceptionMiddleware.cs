@@ -42,7 +42,7 @@ public sealed class GlobalExceptionMiddleware(RequestDelegate next, ILogger<Glob
             };
             problem.Extensions["traceId"] = context.TraceIdentifier;
 
-            await context.Response.WriteAsJsonAsync(problem);
+            await context.Response.WriteAsJsonAsync(problem, (System.Text.Json.JsonSerializerOptions?)null, "application/problem+json");
         }
     }
 }
