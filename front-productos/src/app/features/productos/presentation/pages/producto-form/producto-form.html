@@ -6,7 +6,11 @@
 @if (cargando()) {
   <div class="estado-vacio">Cargando...</div>
 } @else {
+  @if (mensajeExito()) {
+    <div class="alerta alerta-exito alerta-form">{{ mensajeExito() }}</div>
+  }
   <div class="grilla-form">
+
     <div class="tarjeta">
       <h3 class="seccion-titulo">Datos del producto</h3>
       <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>

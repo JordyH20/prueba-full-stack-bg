@@ -33,6 +33,7 @@ export class ProductoFormComponent implements OnInit {
   readonly lotes         = signal<Lote[]>([]);
   readonly loteEditando  = signal<Lote | null>(null);
   readonly guardandoLote = signal(false);
+  readonly mensajeExito  = signal<string | null>(null);
 
   readonly form = this.fb.group({
     codigo:      ['', [Validators.required, Validators.maxLength(50), Validators.pattern(ALFANUM_GUION)]],
@@ -55,6 +56,12 @@ export class ProductoFormComponent implements OnInit {
       const id = Number(idParam);
       this.productoId.set(id);
       this.cargando.set(true);
+
+      const nav = this.router.getCurrentNavigation();
+      const creado = nav?.extras?.state?.['creado'] ??
+        (typeof history !== 'undefined' && history.state?.['creado']);
+      if (creado) this.mostrarExito('Producto creado. Ahora podés agregar lotes.');
+
       this.obtener.ejecutar(id).subscribe({
         next: p => {
           this.form.patchValue({ codigo: p.codigo, nombre: p.nombre, descripcion: p.descripcion, estado: p.estado });
@@ -76,6 +83,11 @@ export class ProductoFormComponent implements OnInit {
     return !!(c?.errors?.[tipo] && c.touched);
   }
 
+  private mostrarExito(msg: string): void {
+    this.mensajeExito.set(msg);
+    setTimeout(() => this.mensajeExito.set(null), 4000);
+  }
+
   enviar(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.guardando.set(true);
@@ -87,8 +99,12 @@ export class ProductoFormComponent implements OnInit {
 
     obs.subscribe({
       next: p => {
-        if (this.esNuevo) this.router.navigate(['/productos', p.id]);
-        else this.guardando.set(false);
+        if (this.esNuevo) {
+          this.router.navigate(['/productos', p.id], { state: { creado: true } });
+        } else {
+          this.guardando.set(false);
+          this.mostrarExito('Cambios guardados correctamente.');
+        }
       },
       error: () => this.guardando.set(false)
     });
@@ -124,6 +140,7 @@ export class ProductoFormComponent implements OnInit {
         this.loteEditando.set(null);
         this.loteForm.reset();
         this.guardandoLote.set(false);
+        this.mostrarExito(editando ? 'Lote actualizado.' : 'Lote agregado.');
       },
       error: () => this.guardandoLote.set(false)
     });
