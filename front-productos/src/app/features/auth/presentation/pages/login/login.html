@@ -18,7 +18,11 @@
           placeholder="usuario@correo.com"
         />
         @if (form.get('correo')?.invalid && form.get('correo')?.touched) {
-          <span class="campo-error">Ingresá un correo válido.</span>
+          @if (form.get('correo')?.errors?.['required']) {
+            <span class="campo-error">El correo es requerido.</span>
+          } @else if (form.get('correo')?.errors?.['email']) {
+            <span class="campo-error">Ingresá un correo válido.</span>
+          }
         }
       </div>
 
@@ -33,7 +37,11 @@
           placeholder="••••••••"
         />
         @if (form.get('contrasena')?.invalid && form.get('contrasena')?.touched) {
-          <span class="campo-error">La contraseña es requerida.</span>
+          @if (form.get('contrasena')?.errors?.['required']) {
+            <span class="campo-error">La contraseña es requerida.</span>
+          } @else if (form.get('contrasena')?.errors?.['minlength']) {
+            <span class="campo-error">Mínimo 8 caracteres.</span>
+          }
         }
       </div>
 

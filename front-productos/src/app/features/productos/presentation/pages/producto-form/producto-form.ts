@@ -8,6 +8,10 @@ import { GuardarLoteUseCase } from '../../../application/use-cases/guardar-lote.
 import { EliminarLoteUseCase } from '../../../application/use-cases/eliminar-lote.use-case';
 import { Lote } from '../../../domain/models/lote';
 
+const SOLO_LETRAS = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9\s\-\.]{2,150}$/;
+const ALFANUM_GUION = /^[A-Za-z0-9\-]{1,50}$/;
+const ALFANUM_LOTE  = /^[A-Za-z0-9\-]{1,80}$/;
+
 @Component({
   selector: 'app-producto-form',
   imports: [ReactiveFormsModule, RouterLink, DecimalPipe],
@@ -15,32 +19,32 @@ import { Lote } from '../../../domain/models/lote';
   styleUrl: './producto-form.css'
 })
 export class ProductoFormComponent implements OnInit {
-  private readonly fb = inject(FormBuilder);
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly obtener = inject(ObtenerProductoUseCase);
-  private readonly guardar = inject(GuardarProductoUseCase);
-  private readonly guardarLote = inject(GuardarLoteUseCase);
-  private readonly eliminarLote = inject(EliminarLoteUseCase);
+  private readonly fb            = inject(FormBuilder);
+  private readonly route         = inject(ActivatedRoute);
+  private readonly router        = inject(Router);
+  private readonly obtener       = inject(ObtenerProductoUseCase);
+  private readonly guardar       = inject(GuardarProductoUseCase);
+  private readonly guardarLote   = inject(GuardarLoteUseCase);
+  private readonly eliminarLote  = inject(EliminarLoteUseCase);
 
-  readonly productoId = signal<number | null>(null);
-  readonly cargando = signal(false);
-  readonly guardando = signal(false);
-  readonly lotes = signal<Lote[]>([]);
-  readonly loteEditando = signal<Lote | null>(null);
+  readonly productoId    = signal<number | null>(null);
+  readonly cargando      = signal(false);
+  readonly guardando     = signal(false);
+  readonly lotes         = signal<Lote[]>([]);
+  readonly loteEditando  = signal<Lote | null>(null);
   readonly guardandoLote = signal(false);
 
   readonly form = this.fb.group({
-    codigo: ['', [Validators.required, Validators.maxLength(50)]],
-    nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(150)]],
-    descripcion: ['', Validators.maxLength(500)],
-    estado: ['A', [Validators.required, Validators.pattern('^[AIN]$')]]
+    codigo:      ['', [Validators.required, Validators.maxLength(50), Validators.pattern(ALFANUM_GUION)]],
+    nombre:      ['', [Validators.required, Validators.minLength(2), Validators.maxLength(150), Validators.pattern(SOLO_LETRAS)]],
+    descripcion: ['', [Validators.maxLength(500)]],
+    estado:      ['A', [Validators.required, Validators.pattern(/^[AIN]$/)]]
   });
 
   readonly loteForm = this.fb.group({
-    numeroLote: ['', [Validators.required, Validators.maxLength(80)]],
-    precio: [null as number | null, [Validators.required, Validators.min(0.01)]],
-    stock: [null as number | null, [Validators.required, Validators.min(0)]]
+    numeroLote: ['', [Validators.required, Validators.maxLength(80), Validators.pattern(ALFANUM_LOTE)]],
+    precio:     [null as number | null, [Validators.required, Validators.min(0.01), Validators.max(999999.99)]],
+    stock:      [null as number | null, [Validators.required, Validators.min(0), Validators.max(999999)]]
   });
 
   get esNuevo() { return this.productoId() === null; }
@@ -60,6 +64,16 @@ export class ProductoFormComponent implements OnInit {
         error: () => { this.cargando.set(false); this.router.navigate(['/productos']); }
       });
     }
+  }
+
+  errorDe(campo: string, tipo: string): boolean {
+    const c = this.form.get(campo);
+    return !!(c?.errors?.[tipo] && c.touched);
+  }
+
+  errorLote(campo: string, tipo: string): boolean {
+    const c = this.loteForm.get(campo);
+    return !!(c?.errors?.[tipo] && c.touched);
   }
 
   enviar(): void {
@@ -104,11 +118,9 @@ export class ProductoFormComponent implements OnInit {
     obs.subscribe({
       next: lote => {
         const editando = this.loteEditando();
-        if (editando) {
-          this.lotes.set(this.lotes().map(l => l.id === lote.id ? lote : l));
-        } else {
-          this.lotes.set([lote, ...this.lotes()]);
-        }
+        this.lotes.set(editando
+          ? this.lotes().map(l => l.id === lote.id ? lote : l)
+          : [lote, ...this.lotes()]);
         this.loteEditando.set(null);
         this.loteForm.reset();
         this.guardandoLote.set(false);

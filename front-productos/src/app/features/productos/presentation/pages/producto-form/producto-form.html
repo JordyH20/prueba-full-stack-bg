@@ -10,34 +10,50 @@
     <div class="tarjeta">
       <h3 class="seccion-titulo">Datos del producto</h3>
       <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+
         <div class="campo-grupo">
           <label class="campo-label" for="codigo">Código</label>
-          <input id="codigo" type="text" class="campo" formControlName="codigo" />
-          @if (form.get('codigo')?.invalid && form.get('codigo')?.touched) {
-            <span class="campo-error">El código es requerido (máx. 50 caracteres).</span>
+          <input id="codigo" type="text" class="campo" formControlName="codigo" placeholder="PROD-001" />
+          @if (errorDe('codigo', 'required')) {
+            <span class="campo-error">El código es requerido.</span>
+          } @else if (errorDe('codigo', 'maxlength')) {
+            <span class="campo-error">Máximo 50 caracteres.</span>
+          } @else if (errorDe('codigo', 'pattern')) {
+            <span class="campo-error">Solo letras, números y guiones (sin espacios).</span>
           }
         </div>
+
         <div class="campo-grupo">
           <label class="campo-label" for="nombre">Nombre</label>
-          <input id="nombre" type="text" class="campo" formControlName="nombre" />
-          @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
-            <span class="campo-error">El nombre es requerido (2–150 caracteres).</span>
+          <input id="nombre" type="text" class="campo" formControlName="nombre" placeholder="Nombre del producto" />
+          @if (errorDe('nombre', 'required')) {
+            <span class="campo-error">El nombre es requerido.</span>
+          } @else if (errorDe('nombre', 'minlength')) {
+            <span class="campo-error">Mínimo 2 caracteres.</span>
+          } @else if (errorDe('nombre', 'maxlength')) {
+            <span class="campo-error">Máximo 150 caracteres.</span>
+          } @else if (errorDe('nombre', 'pattern')) {
+            <span class="campo-error">Solo letras, números, espacios, guiones y puntos.</span>
           }
         </div>
+
         <div class="campo-grupo">
-          <label class="campo-label" for="descripcion">Descripción</label>
-          <textarea id="descripcion" class="campo campo-textarea" formControlName="descripcion" rows="3"></textarea>
+          <label class="campo-label" for="descripcion">Descripción <span class="campo-opcional">(opcional)</span></label>
+          <textarea id="descripcion" class="campo campo-textarea" formControlName="descripcion" rows="3" placeholder="Descripción del producto..."></textarea>
+          @if (errorDe('descripcion', 'maxlength')) {
+            <span class="campo-error">Máximo 500 caracteres.</span>
+          }
+          <span class="campo-contador">{{ form.get('descripcion')?.value?.length ?? 0 }}/500</span>
         </div>
+
         <div class="campo-grupo">
           <label class="campo-label" for="estado">Estado</label>
           <select id="estado" class="campo" formControlName="estado">
             <option value="A">Activo</option>
             <option value="I">Inactivo</option>
           </select>
-          @if (form.get('estado')?.invalid && form.get('estado')?.touched) {
-            <span class="campo-error">Selecciona un estado válido.</span>
-          }
         </div>
+
         <button type="submit" class="boton boton-primario" [disabled]="guardando()">
           {{ guardando() ? 'Guardando...' : (esNuevo ? 'Crear producto' : 'Guardar cambios') }}
         </button>
@@ -48,29 +64,45 @@
       <div class="tarjeta">
         <h3 class="seccion-titulo">{{ loteEditando() ? 'Editar lote' : 'Agregar lote' }}</h3>
         <form [formGroup]="loteForm" (ngSubmit)="enviarLote()" novalidate>
+
           <div class="campo-grupo">
             <label class="campo-label" for="numeroLote">N° de lote</label>
-            <input id="numeroLote" type="text" class="campo" formControlName="numeroLote" />
-            @if (loteForm.get('numeroLote')?.invalid && loteForm.get('numeroLote')?.touched) {
+            <input id="numeroLote" type="text" class="campo" formControlName="numeroLote" placeholder="L-2025-01" />
+            @if (errorLote('numeroLote', 'required')) {
               <span class="campo-error">El número de lote es requerido.</span>
+            } @else if (errorLote('numeroLote', 'maxlength')) {
+              <span class="campo-error">Máximo 80 caracteres.</span>
+            } @else if (errorLote('numeroLote', 'pattern')) {
+              <span class="campo-error">Solo letras, números y guiones.</span>
             }
           </div>
+
           <div class="fila-dos">
             <div class="campo-grupo">
               <label class="campo-label" for="precio">Precio</label>
-              <input id="precio" type="number" class="campo" formControlName="precio" min="0.01" step="0.01" />
-              @if (loteForm.get('precio')?.invalid && loteForm.get('precio')?.touched) {
-                <span class="campo-error">Precio mayor a 0.</span>
+              <input id="precio" type="number" class="campo" formControlName="precio" min="0.01" max="999999.99" step="0.01" placeholder="0.00" />
+              @if (errorLote('precio', 'required')) {
+                <span class="campo-error">El precio es requerido.</span>
+              } @else if (errorLote('precio', 'min')) {
+                <span class="campo-error">Debe ser mayor a 0.</span>
+              } @else if (errorLote('precio', 'max')) {
+                <span class="campo-error">No puede superar 999,999.99.</span>
               }
             </div>
+
             <div class="campo-grupo">
               <label class="campo-label" for="stock">Stock</label>
-              <input id="stock" type="number" class="campo" formControlName="stock" min="0" />
-              @if (loteForm.get('stock')?.invalid && loteForm.get('stock')?.touched) {
-                <span class="campo-error">Stock debe ser ≥ 0.</span>
+              <input id="stock" type="number" class="campo" formControlName="stock" min="0" max="999999" placeholder="0" />
+              @if (errorLote('stock', 'required')) {
+                <span class="campo-error">El stock es requerido.</span>
+              } @else if (errorLote('stock', 'min')) {
+                <span class="campo-error">No puede ser negativo.</span>
+              } @else if (errorLote('stock', 'max')) {
+                <span class="campo-error">No puede superar 999,999.</span>
               }
             </div>
           </div>
+
           <div class="acciones-lote">
             <button type="submit" class="boton boton-primario" [disabled]="guardandoLote()">
               {{ guardandoLote() ? 'Guardando...' : (loteEditando() ? 'Actualizar lote' : 'Agregar lote') }}

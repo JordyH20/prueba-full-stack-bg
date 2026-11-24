@@ -4,9 +4,11 @@ namespace BackProductos.Application.Usuarios
 {
     public class LoginRequestDto
     {
-        [Required]
+        [Required(ErrorMessage = "El correo es requerido.")]
+        [EmailAddress(ErrorMessage = "El correo no tiene un formato válido.")]
         public string Correo { get; set; } = string.Empty;
-        [Required]
+
+        [Required(ErrorMessage = "La contraseña es requerida.")]
         public string Contrasena { get; set; } = string.Empty;
     }
 }

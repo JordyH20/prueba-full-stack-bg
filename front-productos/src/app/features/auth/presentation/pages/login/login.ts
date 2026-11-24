@@ -16,12 +16,12 @@ export class LoginComponent {
   readonly error = signal<string | null>(null);
 
   readonly form = this.fb.group({
-    correo: ['', [Validators.required, Validators.email]],
-    contrasena: ['', Validators.required]
+    correo: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
+    contrasena: ['', [Validators.required, Validators.minLength(8)]]
   });
 
   enviar(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.cargando.set(true);
     this.error.set(null);
 

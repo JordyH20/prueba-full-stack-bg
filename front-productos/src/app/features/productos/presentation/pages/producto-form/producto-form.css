@@ -37,6 +37,10 @@
 
 .acciones { display: flex; gap: 0.375rem; }
 
+.campo-opcional { font-size: 0.75rem; color: var(--color-texto-suave); font-weight: 400; }
+
+.campo-contador { font-size: 0.72rem; color: var(--color-texto-suave); text-align: right; display: block; margin-top: 0.125rem; }
+
 @media (max-width: 768px) {
   .grilla-form { grid-template-columns: 1fr; }
   .fila-dos { grid-template-columns: 1fr; }
