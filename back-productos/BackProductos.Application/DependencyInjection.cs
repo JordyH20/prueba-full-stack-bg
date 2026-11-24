@@ -12,6 +12,7 @@ namespace BackProductos.Application
         {
             services.AddScoped<IProductoServicio, ProductoUseCase>();
             services.AddScoped<IUsuarioServicio, UsuarioUseCase>();
+            services.AddScoped<IAuthServicio, AuthUseCase>();
             return services;
         }
     }
