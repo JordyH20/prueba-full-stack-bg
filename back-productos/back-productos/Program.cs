@@ -7,23 +7,20 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((_, logger) => logger
-    .MinimumLevel.Information()
-    .Enrich.FromLogContext()
-    .WriteTo.Console());
+builder.Host.UseSerilog((ctx, config) =>
+    config.ReadFrom.Configuration(ctx.Configuration));
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
+var origenes = builder.Configuration["Cors:Origenes"]?.Split(',') ?? ["http://localhost:4200"];
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularPolicy", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins(origenes)
               .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+              .AllowAnyMethod());
 });
 
 builder.Services.AddControllers();

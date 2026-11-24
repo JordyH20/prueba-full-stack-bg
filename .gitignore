@@ -59,6 +59,8 @@ coverage/
 *.temp
 *.log
 *.bak
+logs/
+**/logs/
 
 # =====================================
 # SISTEMA OPERATIVO
