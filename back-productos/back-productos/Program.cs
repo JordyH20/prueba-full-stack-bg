@@ -23,7 +23,30 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod());
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = ctx =>
+        {
+            var errores = ctx.ModelState
+                .Where(e => e.Value?.Errors.Count > 0)
+                .SelectMany(e => e.Value!.Errors.Select(x => $"{e.Key}: {x.ErrorMessage}"))
+                .ToArray();
+
+            var problem = new Microsoft.AspNetCore.Mvc.ProblemDetails
+            {
+                Status   = StatusCodes.Status400BadRequest,
+                Title    = "Datos inválidos",
+                Detail   = string.Join(" | ", errores),
+                Instance = ctx.HttpContext.Request.Path
+            };
+            problem.Extensions["traceId"] = ctx.HttpContext.TraceIdentifier;
+            return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(problem)
+            {
+                ContentTypes = { "application/problem+json" }
+            };
+        };
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
